@@ -13,9 +13,11 @@ from ltx_video.inference import infer, InferenceConfig, load_pipeline_config
 # Set CUDA memory management environment variables
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "expandable_segments:True"
 
-# Use /home for caches to persist between sessions
+# Use current working directory for outputs (Gradio requirement)
+
 CACHE_DIR = os.path.join("/home", "ltx_video_cache")
-OUTPUT_DIR = os.path.join("/home", "ltx_video_outputs")
+OUTPUT_DIR = os.path.join("/workspace", "ltx_video_outputs")
+
 
 # Create directories if they don't exist
 os.makedirs(CACHE_DIR, exist_ok=True)
@@ -95,8 +97,7 @@ def image_to_video(
         
         # Enable CPU offloading to save GPU memory
         pipeline_config["offload_to_cpu"] = True
-        pipe.vae.enable_tiling()
-
+        # Disable FP8 for now due to compatibility issues
         
         # Configure and run inference
         config = InferenceConfig(
@@ -275,4 +276,4 @@ with gr.Blocks(title="LTX-Video Generator") as app:
 
 # Launch the app
 if __name__ == "__main__":
-    app.launch(share=True)
+    app.launch(share=True,debug=True)
